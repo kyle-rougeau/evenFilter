@@ -15,8 +15,12 @@ public class Main {
     static final int RAND_MAX = 1000;
 
     static final double TIME_MAGNITUDE = 1000000;
-    static final int NUMERIC_PRECISION = 6;
+    static final int NUMERIC_PRECISION = 5; //no larger than 5
     static final String ROUND_TO = "%.4f";
+
+
+    static double[] weights_x = {1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1};
+    static double[] weights_y = {1,-1.56,0.64};
 
     public static void movingAverage(int[] sample, double magnifier)
     {
@@ -113,11 +117,18 @@ public class Main {
 
         Random r = new Random();
         int x[] = new int[SAMPLE_SIZE];
-        int[] weights_x = {100,200,300,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1,2,3,4,5,6,7,8,9,10,1};
-        int[] weights_y = {100,-156,64};
         double magnifier = Math.pow(10,NUMERIC_PRECISION);
 
-        int test[] = {1,2,3,4,5,6,7,8,9,10};
+        int[] weights_x_INT = new int[weights_x.length];
+        int[] weights_y_INT = new int[weights_y.length];
+        int test[] = {1,2,3,4,5,6,7,8,9,10,11};
+
+        for (int i = 0; i < FILTER_WIDTH_X; i++)
+            weights_x_INT[i] = (int)(weights_x[i]*magnifier);
+
+        for (int i = 0; i < FILTER_WIDTH_Y; i++)
+            weights_y_INT[i] = (int)(weights_y[i]*magnifier);
+
         for (int i = 0; i < test.length; i++) {
             test[i] *= magnifier;
         }
@@ -126,7 +137,7 @@ public class Main {
         long diff;
 
         for (int i = 0; i < SAMPLE_SIZE; i++)
-            x[i] = r.nextInt(RAND_MAX);
+            x[i] = (int)(r.nextInt(RAND_MAX)*magnifier);
 
         
         start = System.nanoTime();
@@ -135,12 +146,12 @@ public class Main {
         System.err.println(String.format(ROUND_TO,diff/TIME_MAGNITUDE));
 
         start = System.nanoTime();
-        filterFIR(x, weights_x, magnifier);
+        filterFIR(x, weights_x_INT, magnifier);
         diff = (System.nanoTime() - start);
         System.err.println(String.format(ROUND_TO,diff/TIME_MAGNITUDE));
 
         start = System.nanoTime();
-        filterBA(x, weights_x, weights_y, magnifier);
+        filterBA(x, weights_x_INT, weights_y_INT, magnifier);
         diff = (System.nanoTime() - start);
         System.err.println(String.format(ROUND_TO,diff/TIME_MAGNITUDE));
     }
